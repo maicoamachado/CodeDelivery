@@ -32,4 +32,8 @@ class Order extends Model implements Transformable
         return $this->hasMany(\CodeDelivery\Models\Product::class);   
     }
 
+    public function cupom(){
+        return $this->belongsTo(\CodeDelivery\Models\Cupom::class);
+    }
+
 }
