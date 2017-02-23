@@ -44,26 +44,38 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth.checkrole:admin', 'as' 
         Route::get('/destroy/{id}', ['as' => 'destroy', 'uses'=> 'ClientsController@destroy']);
     });
 
+    Route::group(['prefix' => 'cupoms', 'as' => 'cupoms.'], function(){
+        Route::get('/',['as' => 'index', 'uses' => 'CupomsController@index']);
+        Route::get('/create', ['as' => 'create', 'uses'=> 'CupomsController@create']);
+        Route::post('/store', ['as' => 'store', 'uses'=> 'CupomsController@store']);
+        Route::get('/edit/{id}', ['as' => 'edit', 'uses'=> 'CupomsController@edit']);
+        Route::post('/update/{id}', ['as' => 'update', 'uses'=> 'CupomsController@update']);
+        Route::get('/destroy/{id}', ['as' => 'destroy', 'uses'=> 'CupomsController@destroy']);
+    });
     
     Route::group(['prefix'=>'orders', 'as' => 'orders.'], function() {
         Route::get('/', ['as' => 'index', 'uses' => 'OrdersController@index']);
-        Route::get('create', ['as' => 'create', 'uses' => 'OrdersController@create']);
         Route::get('edit/{id}', ['as' => 'edit', 'uses' => 'OrdersController@edit']);
         Route::post('update/{id}', ['as' => 'update', 'uses' => 'OrdersController@update']);
-        Route::post('store', ['as' => 'store', 'uses' => 'OrdersController@store']);
-        Route::get('/destroy/{id}', ['as' => 'destroy', 'uses'=> 'OrdersController@destroy']);
-        Route::get('itens/{id}', ['as' => 'itens.index', 'uses' => 'OrderItensController@index']);
-        
-        Route::group(['prefix'=>'itens', 'as' => 'itens.'], function() {
-            Route::get('create/{id}', ['as' => 'create', 'uses' => 'OrderItensController@create']);
-            Route::get('destroy/{id}/{Order}', ['as' => 'destroy', 'uses' => 'OrderItensController@destroy']);
-            //Route::get('edit/{id}', ['as' => 'edit', 'uses' => 'OrderItensController@edit']);
-            //Route::post('update/{id}', ['as' => 'update', 'uses' => 'OrderItensController@update']);
-            Route::post('store/{id}', ['as' => 'store', 'uses' => 'OrderItensController@store']);
-        });
     });
 });
 
+Route::group(['prefix' => 'customer', 'as' => 'customer.', 'middleware' => 'auth.checkrole:client',], function(){
+    
+    Route::get('/order', ['as' => 'order.index', 'uses' => 'CheckoutController@index']);
+    Route::get('order/create', ['as' => 'order.create', 'uses' => 'CheckoutController@create']);
+    Route::post('order/store', ['as' => 'order.store', 'uses' => 'CheckoutController@store']);
+});
+
+Route::post('oauth/access_token', function() {
+    return Response::json(Authorizer::issueAccessToken());
+});
+
+Route::group(['prefix' => 'api', 'middleware' => 'oauth', 'as' => 'api.'], function(){
+    Route::get('pedidos', function(){
+        return ['id' => 1,  'client' => 'Maico Machado', 'total' => 10];
+    });
+});
 
 
 

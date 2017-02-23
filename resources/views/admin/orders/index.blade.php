@@ -18,13 +18,15 @@
             <tbody>
             @foreach($orders as $order)
                 <tr>
-                    <td>{{ $order->id }}</td>
+                    <td>#{{ $order->id }}</td>
                     <td>{{ $order->client->user->name }}</td>
                     <td>{{$order->created_at}}</td>
                     <td>
+                        <ul>
                         @foreach($order->items as $item)
-                            {{$item->product->name}}<br>
+                            <li>{{$item->product->name}}</li>
                         @endforeach
+                        </ul>
                     </td>
                     @if(isset($order->deliveryman->name))
                         <td>{{$order->deliveryman->name}}</td>

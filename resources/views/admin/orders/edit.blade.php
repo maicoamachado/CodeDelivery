@@ -5,7 +5,7 @@
             <h3>Pedido #{{$order->id}} - R${{$order->total}}</h3>
             <h4>Cliente: {{$order->client->user->name}}</h4>
             <h4>Data: {{$order->created_at}}</h4>
-            <p>Entregar em: {{$order->client->address}} - {{$order->client->state}}</p>
+            <p><b>Entregar em:</b><br> {{$order->client->address}} - {{$order->client->state}}</p>
         </div>
         @include('errors._check')
         {!! Form::open(['route' => ['admin.orders.update', $order->id]]) !!}

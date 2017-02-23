@@ -12,7 +12,8 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Prettus\Repository\Contracts\Transformable;
 use Prettus\Repository\Traits\TransformableTrait;
 
-class User extends Model implements Transformable,AuthenticatableContract,
+class User extends Model implements Transformable,
+                                    AuthenticatableContract,
                                     AuthorizableContract,
                                     CanResetPasswordContract
 {

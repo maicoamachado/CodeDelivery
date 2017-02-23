@@ -25,5 +25,8 @@ class StatusOrdersTableSeeder extends Seeder
         factory(\CodeDelivery\Models\StatusOrders::class)->create([
             'name' => 'Entrega realizada'
         ]);
+        factory(\CodeDelivery\Models\StatusOrders::class)->create([
+            'name' => 'Cancelado'
+        ]);
     }
 }

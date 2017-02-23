@@ -12,7 +12,7 @@
 </div>
 <div class="form-group">
     {!! Form::label('Address', 'Endereço:') !!}
-    {!! Form::text('address', null, ['class' => 'form-control']) !!}
+    {!! Form::textarea('address', null, ['class' => 'form-control']) !!}
 </div>
 <div class="form-group">
     {!! Form::label('city', 'Cidade:') !!}

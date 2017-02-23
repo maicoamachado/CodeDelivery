@@ -56,10 +56,18 @@ $factory->define(CodeDelivery\Models\Order::class, function (Faker\Generator $fa
         'total' => $faker->numberBetween(50, 100)
     ];
 });
+
 $factory->define(CodeDelivery\Models\OrderItem::class, function (Faker\Generator $faker) {
     return [
         'product_id' => $faker->numberBetween(1, 5),
         'qtd' => $faker->numberBetween(1, 3),
         'price' => $faker->numberBetween(50, 100)
+    ];
+});
+
+$factory->define(CodeDelivery\Models\Cupom::class, function (Faker\Generator $faker) {
+    return [
+        'code' => $faker->numberBetween(100, 1000),
+        'value' => $faker->numberBetween(50, 100)
     ];
 });

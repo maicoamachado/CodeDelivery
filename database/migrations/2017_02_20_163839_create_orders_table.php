@@ -18,9 +18,8 @@ class CreateOrdersTable extends Migration
             $table->foreign('client_id')->references('id')->on('users');
             $table->integer('user_deliveryman_id')->unsigned()->nullable();
             $table->foreign('user_deliveryman_id')->references('id')->on('users');
-            $table->decimal('total');            
-            $table->integer('status_id')->unsigned();
-            //$table->foreign('status_id')->references('id')->on('status_orders');
+			$table->integer('status_id')->unsigned()->nullable();  
+            $table->decimal('total');          
             $table->timestamps();
         });
     }
