@@ -10,7 +10,15 @@ class Order extends Model implements Transformable
 {
     use TransformableTrait;
 
-    protected $fillable = ['client_id', 'user_deliveryman_id', 'total', 'status_id'];
+    protected $fillable = ['client_id', 'user_deliveryman_id', 'total', 'status_id', 'cupom_id'];
+
+
+    public function transform(){
+        return [
+            'order' => $this->id,
+            'order_items' => $this->items
+        ];
+    }
 
     public function items(){
         return $this->hasMany(\CodeDelivery\Models\OrderItem::class);   

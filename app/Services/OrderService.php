@@ -4,6 +4,7 @@ namespace CodeDelivery\Services;
 use CodeDelivery\Repositories\OrderRepository;
 use CodeDelivery\Repositories\CupomRepository;
 use CodeDelivery\Repositories\ProductRepository;
+use CodeDelivery\Models\Order;
 
 class OrderService{
     
@@ -23,6 +24,11 @@ class OrderService{
 
         \DB::beginTransaction();
         try{
+
+            if(isset($data['cupom_id'])){
+                unset($data['cupom_id']);
+            }
+
             $data['status_id'] = 1;
             if(isset($data['cupom_code'])){
                 $cupom = $this->cupomRepository->findByField('code', $data['cupom_code'])->first();
@@ -62,5 +68,17 @@ class OrderService{
 
     public function update(array $data, $id){
         
+    }
+
+    public function updateStatus($id, $idDeliveryman, $status){
+        $order = $this->orderRepository->getByIdAndDeliveryman($id, $idDeliveryman);
+
+        if($order instanceof Order){
+            $order->status_id = $status;
+            $order->save();
+            return $order;
+        }
+
+        return false;
     }
 }
