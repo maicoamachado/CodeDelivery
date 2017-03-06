@@ -49,7 +49,7 @@ class ClientCheckoutController extends Controller
     }
 
     public function create(){
-        $products = $this->productRepository->list();
+        $products = $this->productRepository->getLists();
         return view('customer.order.create', compact('products'));
     }
 

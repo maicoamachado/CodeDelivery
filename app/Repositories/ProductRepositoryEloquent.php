@@ -24,7 +24,7 @@ class ProductRepositoryEloquent extends BaseRepository implements ProductReposit
         return Product::class;
     }
 
-    public function list(){
+    public function getLists(){
         return $this->model->get(['id', 'name', 'price']);
     }
     

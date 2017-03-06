@@ -71,3 +71,11 @@ $factory->define(CodeDelivery\Models\Cupom::class, function (Faker\Generator $fa
         'value' => $faker->numberBetween(50, 100)
     ];
 });
+
+$factory->define(CodeDelivery\Models\Oauth_Clients::class, function (Faker\Generator $faker) {
+    return [
+        'id' => 'appid01',
+        'secret' => 'secret',
+        'name' => 'Minha App Mobile'
+    ];
+});

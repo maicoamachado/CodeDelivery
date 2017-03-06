@@ -30,7 +30,7 @@ class OrdersController extends Controller
 
     public function edit($id){
         $order = $this->repository->find($id);
-        $deliveryman = $this->userRepository->list('deliveryman');
+        $deliveryman = $this->userRepository->roleLists('deliveryman');
         $status = $this->statusOrdersRepository->getStatusOrdersLists();
         return view('admin.orders.edit', compact('order', 'deliveryman', 'status'));
     }
