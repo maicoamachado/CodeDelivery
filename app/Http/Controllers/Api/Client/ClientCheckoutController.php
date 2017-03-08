@@ -74,4 +74,10 @@ class ClientCheckoutController extends Controller
         
         return $order;
     }
+
+    //temporary
+    public function authenticated(){
+        $id = Authorizer::getResourceOwnerId();
+        return $this->userRepository->find($id);
+    }
 }

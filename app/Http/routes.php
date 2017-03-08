@@ -73,9 +73,9 @@ Route::post('oauth/access_token', function() {
 });
 
 Route::group(['prefix' => 'api', 'middleware' => 'oauth', 'as' => 'api.'], function(){
-    Route::get('teste', function() {
-        echo 'api/teste';
-    });
+     //temporary
+    Route::get('authenticated ', ['uses' =>
+            'Api\Client\ClientCheckoutController@authenticated', 'as' => 'authenticated']);
 
     Route::group(['prefix' => 'client', 'middleware' => 'oauth.checkrole:client', 'as' => 'client.'], function(){
         Route::resource('order', 
