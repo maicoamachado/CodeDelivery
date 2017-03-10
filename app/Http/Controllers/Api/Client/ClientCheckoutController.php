@@ -78,6 +78,6 @@ class ClientCheckoutController extends Controller
     //temporary
     public function authenticated(){
         $id = Authorizer::getResourceOwnerId();
-        return $this->userRepository->find($id);
+        return $this->userRepository->skipPresenter(false)->find($id);
     }
 }
