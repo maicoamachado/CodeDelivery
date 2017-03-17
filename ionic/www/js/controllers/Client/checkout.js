@@ -1,14 +1,15 @@
 angular.module('starter.controllers').
-controller('ClientCheckoutCtrl', ['$state', '$scope', '$cart', 'Order', '$ionicLoading', '$ionicPopup',
-    function($state, $scope, $cart, Order, $ionicLoading, $ionicPopup) {
+controller('ClientCheckoutCtrl', ['$state', '$scope', '$cart', 'Order', '$ionicLoading', '$ionicPopup', 'Cupom', '$cordovaBarcodeScanner',
+    function($state, $scope, $cart, Order, $ionicLoading, $ionicPopup, Cupom, $cordovaBarcodeScanner) {
         var cart = $cart.get();
         $scope.items = cart.items;
-        $scope.total = cart.total;
+        $scope.cupom = cart.cupom;
+        $scope.total = $cart.getTotalFinal();
 
         $scope.removeItem = function(i) {
             $cart.removeItem(i);
             $scope.items.splice(i, 1);
-            $scope.total = $cart.get().total;
+            $scope.total = $cart.getTotalFinal();
         };
 
         $scope.openProductDetail = function(i) {
@@ -20,22 +21,80 @@ controller('ClientCheckoutCtrl', ['$state', '$scope', '$cart', 'Order', '$ionicL
         };
 
         $scope.save = function() {
+            if ($cart.get().cupom.value > $cart.getTotalFinal()) {
+                this.removeCupom();
+                $ionicPopup.alert({
+                    title: 'Advertência',
+                    template: 'Cupom removido. Por favor, adicione um ou mais itens no pedido para utilizar este cupom.'
+                });
+            } else {
+                var obj = { items: angular.copy($scope.items) };
+                angular.forEach(obj.items, function(item) {
+                    item.product_id = item.id;
+                });
+                $ionicLoading.show({
+                    template: 'Carregando...'
+                });
+                if ($scope.cupom.value) {
+                    obj.cupom_code = $scope.cupom.code;
+                }
+                Order.save({ id: null }, obj, function(data) {
+                    $state.go('client.checkout_successful');
+                    $ionicLoading.hide();
+                }, function(responseError) {
+                    $ionicLoading.hide();
+                    $ionicPopup.alert({
+                        title: 'Advertência',
+                        template: 'Pedido não realizado. Tente novamente.'
+                    });
+                });
 
-            var items = angular.copy($scope.items);
-            angular.forEach(items, function(item) {
-                item.product_id = item.id;
-            });
+            }
+        };
+
+        $scope.readBarCode = function() {
+            $cordovaBarcodeScanner
+                .scan()
+                .then(function(barcodeData) {
+                    // Success! Barcode data is here
+                    getValueCupom(barcodeData.text);
+                }, function(error) {
+                    // An error occurred
+                    $ionicPopup.alert({
+                        title: 'Advertência',
+                        template: 'Não foi possível ler o codigo de barras. Tente novamente.'
+                    });
+                });
+        };
+
+        $scope.removeCupom = function() {
+            $cart.removeCupom();
+            $scope.cupom = $cart.get().cupom;
+            $scope.total = $cart.getTotalFinal();
+        };
+
+        function getValueCupom(code) {
             $ionicLoading.show({
                 template: 'Carregando...'
             });
-            Order.save({ id: null }, { items: items }, function(data) {
-                $state.go('client.checkout_successful');
+            Cupom.get({ code: code }, function(data) {
+                if ($cart.getTotalFinal() > data.data.value) {
+                    $cart.setCupom(data.data.code, data.data.value);
+                    $scope.cupom = $cart.get().cupom;
+                    $scope.total = $cart.getTotalFinal();
+                } else {
+                    $ionicPopup.alert({
+                        title: 'Advertência',
+                        template: 'Você precisa adicionar um ou mais itens no pedido para utilizar este cupom.'
+                    });
+                }
                 $ionicLoading.hide();
+
             }, function(responseError) {
                 $ionicLoading.hide();
                 $ionicPopup.alert({
                     title: 'Advertência',
-                    template: 'Pedido não realizado. Tente novamente.'
+                    template: 'Cupom inválido.'
                 });
             });
         };

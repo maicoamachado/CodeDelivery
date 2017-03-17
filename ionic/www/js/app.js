@@ -6,9 +6,9 @@
 angular.module('starter.controllers', []);
 angular.module('starter.services', []);
 
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'angular-oauth2', 'ngResource'])
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'angular-oauth2', 'ngResource', 'ngCordova'])
     .constant('appConfig', {
-        baseUrl: 'http://localhost:8000',
+        baseUrl: 'http://10.10.0.55:8000',
     })
     .run(['$ionicPlatform', function($ionicPlatform) {
 
@@ -28,7 +28,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             }
         });
     }])
-    .config(function($stateProvider, $urlRouterProvider, OAuthProvider, OAuthTokenProvider, appConfig) {
+    .config(function($stateProvider, $urlRouterProvider, OAuthProvider, OAuthTokenProvider, appConfig, $provide) {
         OAuthProvider.configure({
             baseUrl: appConfig.baseUrl,
             clientId: 'appid01',
@@ -41,7 +41,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
                 secure: false
             }
         });
-        //$urlRouterProvider.otherwise('/');
+        $urlRouterProvider.otherwise('/login');
         $stateProvider
             .state('login', {
                 url: '/login',
@@ -70,6 +70,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
                 controller: 'ClientCheckoutDetailCtrl'
             })
             .state('client.checkout_successful', {
+                cache: false,
                 url: '/checkout/successful',
                 templateUrl: 'templates/client/checkout_successful.html',
                 controller: 'ClientCheckoutSuccessfulCtrl'
@@ -84,8 +85,38 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
                 templateUrl: 'templates/client/order.html',
                 controller: 'ClientOrderCtrl'
             })
-    })
-    .service('cart', function() {
-        this.items = [];
-
+        $provide.decorator('OAuthToken', ['$localStorage', '$delegate', function($localStorage, $delegate) {
+            Object.defineProperties($delegate, {
+                setToken: {
+                    value: function(data) {
+                        return $localStorage.setObject('token', data);
+                    },
+                    enumerable: true,
+                    configurable: true,
+                    writable: true
+                },
+                getToken: {
+                    value: function() {
+                        return $localStorage.getObject('token');
+                    },
+                    enumerable: true,
+                    configurable: true,
+                    writable: true
+                },
+                removeToken: {
+                    value: function() {
+                        $localStorage.setObject('token', null);
+                    },
+                    enumerable: true,
+                    configurable: true,
+                    writable: true
+                }
+            });
+            return $delegate;
+        }]);
     });
+
+//.service('cart', function() {
+//    this.items = [];
+
+// });
