@@ -5,9 +5,13 @@
 // the 2nd parameter is an array of 'requires'
 angular.module('starter.controllers', []);
 angular.module('starter.services', []);
+angular.module('starter.filters', []);
 
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'angular-oauth2', 'ngResource', 'ngCordova'])
+angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters',
+        'angular-oauth2', 'ngResource', 'ngCordova'
+    ])
     .constant('appConfig', {
+        //baseUrl: 'http://www.skyinformatica.inf.br:47042',
         baseUrl: 'http://10.10.0.55:8000',
     })
     .run(['$ionicPlatform', function($ionicPlatform) {
@@ -41,7 +45,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
                 secure: false
             }
         });
-        $urlRouterProvider.otherwise('/login');
+
         $stateProvider
             .state('login', {
                 url: '/login',
@@ -55,8 +59,10 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             })
             .state('client', {
                 abstract: true,
+                cache: false,
                 url: '/client',
-                template: '<ion-nav-view/>'
+                templateUrl: 'templates/client/menu.html',
+                controller: 'ClientMenuCtrl'
             })
             .state('client.checkout', {
                 cache: false,
@@ -77,7 +83,7 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             })
             .state('client.view_products', {
                 url: '/view_products',
-                templateUrl: 'templates/client/view-product.html',
+                templateUrl: 'templates/client/view_product.html',
                 controller: 'ClientViewProductCtrl'
             })
             .state('client.order', {
@@ -85,6 +91,31 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
                 templateUrl: 'templates/client/order.html',
                 controller: 'ClientOrderCtrl'
             })
+            .state('client.view_order', {
+                url: '/view_order/:id',
+                templateUrl: 'templates/client/view_order.html',
+                controller: 'ClientViewOrderCtrl'
+            })
+            .state('deliveryman', {
+                abstract: true,
+                cache: false,
+                url: '/deliveryman',
+                templateUrl: 'templates/deliveryman/menu.html',
+                controller: 'DeliverymanMenuCtrl'
+            })
+            .state('deliveryman.order', {
+                url: '/order',
+                templateUrl: 'templates/deliveryman/order.html',
+                controller: 'DeliverymanOrderCtrl'
+            })
+            .state('deliveryman.view_order', {
+                cache: false,
+                url: '/view_order/:id',
+                templateUrl: 'templates/deliveryman/view_order.html',
+                controller: 'DeliverymanViewOrderCtrl'
+            });
+
+        $urlRouterProvider.otherwise('/login');
         $provide.decorator('OAuthToken', ['$localStorage', '$delegate', function($localStorage, $delegate) {
             Object.defineProperties($delegate, {
                 setToken: {
@@ -115,8 +146,3 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             return $delegate;
         }]);
     });
-
-//.service('cart', function() {
-//    this.items = [];
-
-// });

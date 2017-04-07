@@ -25,8 +25,18 @@ class OrderTransformer extends TransformerAbstract
             'id'         => (int) $model->id,
             'total'      => (float) $model->total,
             'status'     => $model->status->name, 
+            'product_names' => $this->getArrayProductName($model->items),
             'created_at' => $model->created_at
         ];
+    }
+
+    protected function getArrayProductName(\Illuminate\Database\Eloquent\Collection $items){
+        $names = [];
+        foreach($items as $item){
+            $names[] = $item->product->name;
+        }
+
+        return $names;
     }
 
     public function includeCupom(Order $model){

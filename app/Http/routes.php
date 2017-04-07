@@ -74,9 +74,6 @@ Route::group(['middleware' => 'cors'], function(){
     });
 
     Route::group(['prefix' => 'api', 'middleware' => 'oauth', 'as' => 'api.'], function(){
-        //temporary
-        Route::get('authenticated ', ['uses' =>
-                'Api\Client\ClientCheckoutController@authenticated', 'as' => 'authenticated']);
 
         Route::group(['prefix' => 'client', 'middleware' => 'oauth.checkrole:client', 'as' => 'client.'], function(){
             Route::resource('order', 
@@ -91,8 +88,9 @@ Route::group(['middleware' => 'cors'], function(){
             ]);
             Route::patch('order/{id}/update-status', ['uses' =>
                 'Api\Deliveryman\DeliverymanCheckoutController@updateStatus', 'as' => 'order.update-status']);
-        });  
+        });
 
+        Route::get('authenticated ', ['uses' =>'Api\UserController@authenticated', 'as' => 'authenticated']);
         Route::get('cupom/{code}', 'Api\CupomController@show');  
     });
 });
