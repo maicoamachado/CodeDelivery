@@ -7,6 +7,10 @@
   "dependencies": {
     "angular-oauth2": "^4.1.0",
     "angular-resource": "1.4.3",
-    "ngCordova": "^0.1.27-alpha"
+    "ngCordova": "^0.1.27-alpha",
+    "pusher-angular": "^0.1.9",
+    "pusher-js": "pusher#^4.0.0",
+    "marker-animate-unobtrusive": "^0.2.8",
+    "jquery.easing": "^1.3.1"
   }
 }

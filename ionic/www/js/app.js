@@ -8,15 +8,17 @@ angular.module('starter.services', []);
 angular.module('starter.filters', []);
 
 angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters',
-        'angular-oauth2', 'ngResource', 'ngCordova'
+        'angular-oauth2', 'ngResource', 'ngCordova', 'uiGmapgoogle-maps', 'pusher-angular'
     ])
     .constant('appConfig', {
         //baseUrl: 'http://www.skyinformatica.inf.br:47042',
-        baseUrl: 'http://10.10.0.55:8000',
+        baseUrl: 'http://localhost:8000',
+        pusherKey: 'ec62621b088caa2fe689',
     })
-    .run(['$ionicPlatform', function($ionicPlatform) {
-
+    .run(['$ionicPlatform', '$window', 'appConfig', function($ionicPlatform, $window, appConfig) {
+        $window.client = new Pusher(appConfig.pusherKey);
         $ionicPlatform.ready(function() {
+
             if (window.cordova && window.cordova.plugins.Keyboard) {
                 // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
                 // for form inputs)
@@ -95,6 +97,11 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
                 url: '/view_order/:id',
                 templateUrl: 'templates/client/view_order.html',
                 controller: 'ClientViewOrderCtrl'
+            })
+            .state('client.view_delivery', {
+                url: '/view_delivery/:id',
+                templateUrl: 'templates/client/view_delivery.html',
+                controller: 'ClientViewDeliveryCtrl'
             })
             .state('deliveryman', {
                 abstract: true,
