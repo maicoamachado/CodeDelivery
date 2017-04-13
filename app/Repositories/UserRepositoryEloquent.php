@@ -29,9 +29,6 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
     public function roleLists($role){
         return $this->model->where(['role' => $role])->lists('name', 'id');
     }
-
-    
-
     /**
      * Boot up the repository, pushing criteria
      */
@@ -43,5 +40,13 @@ class UserRepositoryEloquent extends BaseRepository implements UserRepository
     public function presenter(){
 
         return \CodeDelivery\Presenters\UserPresenter::class;
+    }
+
+    public function updateDeviceToken($id, $deviceToken){
+        $model = $this->model->find($id);
+        $model->device_token = $deviceToken;
+        $model->save();
+
+        return $this->parserResult($model);
     }
 }

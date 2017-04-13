@@ -5,6 +5,7 @@ use CodeDelivery\Repositories\OrderRepository;
 use CodeDelivery\Repositories\CupomRepository;
 use CodeDelivery\Repositories\ProductRepository;
 use CodeDelivery\Models\Order;
+use Dmitrovskiy\IonicPush\PushProcessor;
 
 class OrderService{
     
@@ -13,11 +14,13 @@ class OrderService{
     public function __construct(
         OrderRepository $orderRepository,
         CupomRepository $cupomRepository, 
-        ProductRepository $productRepository
+        ProductRepository $productRepository,
+        PushProcessor $pushProcessor
     ){
         $this->orderRepository = $orderRepository;
         $this->cupomRepository = $cupomRepository;
         $this->productRepository = $productRepository;
+        $this->pushProcessor = $pushProcessor;
     }
 
     public function create(array $data){
@@ -73,10 +76,22 @@ class OrderService{
     public function updateStatus($id, $idDeliveryman, $status){
         $order = $this->orderRepository->getByIdAndDeliveryman($id, $idDeliveryman);
         $order->status_id = $status;
-        if((int)$order->status_id == 3 && !$order->hash){
-            $order->hash = md5((new \DateTime())->getTimestamp());
+
+        switch((int)$order->status_id){
+            case 3: // em transporte
+                if((int)$order->status_id == 3 && !$order->hash){
+                    $order->hash = md5((new \DateTime())->getTimestamp());
+                }
+                $order->save();
+                break;
+            case 4: //entregue ao destinatário
+                $user = $order->client->user;
+                $order->save();
+                $this->pushProcessor->notify([$user->device_token],[
+                    'alert' => "Seu pedido #{$order->id} acabou de ser entregue"
+                ]);
+            break;
         }
-        $order->save();
         return $order;
     }
 }

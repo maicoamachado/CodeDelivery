@@ -7,15 +7,15 @@ angular.module('starter.controllers', []);
 angular.module('starter.services', []);
 angular.module('starter.filters', []);
 
-angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', 'starter.filters',
+angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers', 'starter.services', 'starter.filters',
         'angular-oauth2', 'ngResource', 'ngCordova', 'uiGmapgoogle-maps', 'pusher-angular'
     ])
     .constant('appConfig', {
-        //baseUrl: 'http://www.skyinformatica.inf.br:47042',
-        baseUrl: 'http://localhost:8000',
+        baseUrl: 'http://www.skyinformatica.inf.br:47042',
+        //baseUrl: 'http://localhost:8000',
         pusherKey: 'ec62621b088caa2fe689',
     })
-    .run(['$ionicPlatform', '$window', 'appConfig', function($ionicPlatform, $window, appConfig) {
+    .run(['$ionicPlatform', '$window', 'appConfig', '$localStorage', function($ionicPlatform, $window, appConfig, $localStorage) {
         $window.client = new Pusher(appConfig.pusherKey);
         $ionicPlatform.ready(function() {
 
@@ -32,6 +32,23 @@ angular.module('starter', ['ionic', 'starter.controllers', 'starter.services', '
             if (window.StatusBar) {
                 StatusBar.styleDefault();
             }
+            Ionic.io();
+            var push = new Ionic.Push({
+                debug: true,
+                onNotification: function(message) {
+                    alert(message.text);
+                },
+                pluginConfig: {
+                    android: {
+                        iconColor: 'red'
+                    }
+                }
+            });
+
+            push.register(function(token) {
+                $localStorage.set('device_token', token.token);
+
+            });
         });
     }])
     .config(function($stateProvider, $urlRouterProvider, OAuthProvider, OAuthTokenProvider, appConfig, $provide) {

@@ -93,7 +93,8 @@ Route::group(['middleware' => 'cors'], function(){
         });
 
         Route::get('authenticated ', ['uses' =>'Api\UserController@authenticated', 'as' => 'authenticated']);
-        Route::get('cupom/{code}', 'Api\CupomController@show');  
+        Route::patch('device_token', 'Api\UserController@updateDeviceToken');  
+        Route::get('cupom/{code}', 'Api\CupomController@show');     
     });
 });
 
