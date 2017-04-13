@@ -17,7 +17,11 @@ controller('LoginCtrl', ['$scope', 'OAuth', 'OAuthToken', '$state', '$ionicPopup
                 })
                 .then(function(data) {
                     UserData.set(data.data);
-                    $state.go('client.checkout');
+                    if (data.data.role == 'deliveryman') {
+                        $state.go('deliveryman.order');
+                    } else {
+                        $state.go('client.checkout');
+                    }
                 }, function(responseError) {
                     UserData.set(null);
                     OAuthToken.removeToken();

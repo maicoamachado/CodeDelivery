@@ -1,70 +1,41 @@
-angular.module('nemLogging').provider 'nemSimpleLogger',[ 'nemDebugProvider', (nemDebugProvider) ->
+angular.module('nemLogging',[])
+.provider 'nemSimpleLogger', ->
 
-  nemDebug = nemDebugProvider.debug
-  _debugCache = {}
+  _fns = ['log', 'info', 'debug', 'warn', 'error']
 
-  _fns = ['debug', 'info', 'warn', 'error', 'log']
-  LEVELS = {}
-  for val, key in _fns
-    LEVELS[val] = key
+  LEVELS =
+    log: 1
+    info: 2
+    debug: 3
+    warn: 4
+    error: 5
 
-  _maybeExecLevel = (level, current, fn) ->
+  maybeExecLevel = (level, current, fn) ->
     fn() if level >= current
-
-  _isValidLogObject = (logObject) ->
-    isValid = false
-    return  isValid unless logObject
-    for val in _fns
-      isValid = logObject[val]? and typeof logObject[val] is 'function'
-      break unless isValid
-    isValid
-
-
-  ###
-    Overide logeObject.debug with a nemDebug instance
-    see: https://github.com/visionmedia/debug/blob/master/Readme.md
-  ###
-  _wrapDebug = (namespace, logObject) ->
-    # need to cache debugInstance in order to get consistent color; this could be considered a bug in the debug module
-    if !_debugCache[namespace]?
-      _debugCache[namespace] = nemDebug(namespace)
-    debugInstance = _debugCache[namespace]
-    newLogger = {}
-    for val in _fns
-      newLogger[val] = if val == 'debug' then debugInstance else logObject[val]
-    newLogger
 
   class Logger
     constructor: (@$log) ->
       throw 'internalLogger undefined' unless @$log
-      throw '@$log is invalid' unless _isValidLogObject @$log
       @doLog = true
       logFns = {}
-
-      for level in _fns
-        do (level) =>
-          logFns[level] = (args...) =>
-            if @doLog
-              _maybeExecLevel LEVELS[level], @currentLevel, =>
-                @$log[level](args...)
-          @[level] = logFns[level]
+      _fns.forEach (level) =>
+        logFns[level] = (msg) =>
+          if @doLog
+            maybeExecLevel LEVELS[level], @currentLevel, =>
+              @$log[level](msg)
 
       @LEVELS = LEVELS
       @currentLevel = LEVELS.error
+      _fns.forEach (fnName) =>
+        @[fnName] = logFns[fnName]
 
     spawn: (newInternalLogger) =>
-      if typeof newInternalLogger is 'string'
-        throw '@$log is invalid' unless _isValidLogObject @$log
-        unless nemDebug
-          throw 'nemDebug is undefined this is probably the light version of this library sep debug logggers is not supported!'
-        return _wrapDebug newInternalLogger, @$log
-
       new Logger(newInternalLogger or @$log)
 
   @decorator = ['$log', ($delegate) ->
     #app domain logger enables all logging by default
     log = new Logger($delegate)
-    log.currentLevel = LEVELS.debug
+    log.currentLevel = LEVELS.log
     log
   ]
 
@@ -74,4 +45,3 @@ angular.module('nemLogging').provider 'nemSimpleLogger',[ 'nemDebugProvider', (n
     new Logger($log)
   ]
   @
-]

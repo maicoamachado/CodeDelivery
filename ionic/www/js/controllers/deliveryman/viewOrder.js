@@ -15,6 +15,23 @@ controller('DeliverymanViewOrderCtrl', ['$scope', '$stateParams', 'DeliverymanOr
             $ionicLoading.hide();
         });
 
+        $scope.confirmDelivery = function() {
+            $ionicLoading.show({
+                template: 'Enviando...'
+            });
+
+            DeliverymanOrder.updateStatus({ id: $stateParams.id }, { status: 4 }, function(data) {
+                $ionicLoading.hide();
+                $ionicPopup.alert({
+                    title: 'Advertência',
+                    template: 'Entrega confirmada!'
+                });
+            }, function(dataError) {
+                $ionicLoading.hide();
+            });
+
+        }
+
         $scope.goToDelivery = function() {
             $ionicPopup.alert({
                 title: 'Advertência',

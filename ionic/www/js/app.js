@@ -11,8 +11,7 @@ angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers',
         'angular-oauth2', 'ngResource', 'ngCordova', 'uiGmapgoogle-maps', 'pusher-angular'
     ])
     .constant('appConfig', {
-        baseUrl: 'http://www.skyinformatica.inf.br:47042',
-        //baseUrl: 'http://localhost:8000',
+        baseUrl: 'http://localhost:8000',
         pusherKey: 'ec62621b088caa2fe689',
     })
     .run(['$ionicPlatform', '$window', 'appConfig', '$localStorage', function($ionicPlatform, $window, appConfig, $localStorage) {

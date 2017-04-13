@@ -1,29 +1,39 @@
 gulp = require 'gulp'
 gulpif = require 'gulp-if'
+insert = require 'gulp-insert'
+ourPackage = require '../../package.json'
 coffeelint = require 'gulp-coffeelint'
 coffee = require 'gulp-coffee'
 concat = require 'gulp-concat'
 {log} = require 'gulp-util'
-insert = require 'gulp-insert'
-{header} = require './wrap.coffee'
+uglify = require 'gulp-uglify'
 
-build = (source, out = 'index.js') ->
-  gulp.src source
+coffeeOptions =
+  bare: true
+date = new Date()
+
+header =
+  """
+  /**
+   *  #{ourPackage.name}
+   *
+   * @version: #{ourPackage.version}
+   * @author: #{ourPackage.author}
+   * @date: #{date.toString()}
+   * @license: #{ourPackage.license}
+   */
+  """
+
+gulp.task 'build', ->
+  gulp.src('src/*.coffee')
   .pipe gulpif(/[.]coffee$/,coffeelint())
   .pipe gulpif(/[.]coffee$/,coffeelint.reporter())
-  .pipe gulpif(/[.]coffee$/,coffee(require '../coffeeOptions.coffee').on('error', log))
-  .pipe concat out
-  .pipe gulp.dest 'dist'
-
-gulp.task 'build', gulp.series 'wrapDebug', ->
-  build [ 'src/module.coffee', 'tmp/debugCommonJS.js', 'src/*.coffee'], 'browser.js'
-
-gulp.task 'buildCommonJS', gulp.series 'wrapDebug', ->
-  build [ 'src/module.coffee', 'tmp/debugCommonJS.js', 'src/*.coffee']
-  .pipe insert.prepend("var angular = require('angular');\n\n")
-  .pipe insert.prepend(header())
+  .pipe gulpif(/[.]coffee$/,coffee(coffeeOptions).on('error', log))
+  .pipe(insert.prepend(header))
   .pipe concat 'index.js'
-  .pipe gulp.dest 'dist'
-
-gulp.task 'buildLight', gulp.series 'wrapDebugLight', ->
-  build [ 'src/module.coffee', 'tmp/debugLight.js', 'src/*.coffee'], 'index.light.js'
+  .pipe(gulp.dest 'dist' )
+  .pipe concat 'angular-simple-logger.js'
+  .pipe(gulp.dest 'dist' )
+  .pipe uglify()
+  .pipe concat 'angular-simple-logger.min.js'
+  .pipe(gulp.dest 'dist' )

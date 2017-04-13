@@ -1,14 +1,11 @@
-###global spyOn:true, angular:true, inject:true, expect:true###
 describe 'nemLogging.nemSimpleLogger', ->
   beforeEach ->
     @createSpyLogger = ->
-      @log = ->
       @info = ->
       @debug = ->
       @warn = ->
       @error = ->
 
-      spyOn(@, 'log')
       spyOn(@, 'info')
       spyOn(@, 'debug')
       spyOn(@, 'warn')
@@ -16,7 +13,7 @@ describe 'nemLogging.nemSimpleLogger', ->
       @
 
     $log = @createSpyLogger()
-    @loggger = $log
+    @log = $log
 
     angular.module('nemLogging').config ($provide) ->
       #decorate w/ spys
@@ -27,62 +24,44 @@ describe 'nemLogging.nemSimpleLogger', ->
     inject (nemSimpleLogger) =>
       @subject = nemSimpleLogger
 
-  it 'exists', ->
-    expect(@subject).toBeDefined()
-
   describe 'default', ->
-    ['debug', 'info', 'warn', {called:'error'}, {called:'log'}].forEach (testName) ->
-      {called} = testName
-      testName = if typeof testName == 'string' then testName else testName.called
-      it testName, ->
-        @subject[testName]('blah')
-        if called
-          expect(@loggger[testName]).toHaveBeenCalled()
-          return expect(@loggger[testName]).toHaveBeenCalledWith('blah')
-        expect(@loggger[testName]).not.toHaveBeenCalled()
+    it 'error', ->
+      @subject.error('blah')
+      expect(@log.error).toHaveBeenCalled()
 
+    it 'debug', ->
+      @subject.debug('blah')
+      expect(@log.debug).not.toHaveBeenCalled()
+
+    it 'info', ->
+      @subject.info('blah')
+      expect(@log.info).not.toHaveBeenCalled()
+
+    it 'warn', ->
+      @subject.warn('blah')
+      expect(@log.warn).not.toHaveBeenCalled()
 
   describe 'all on', ->
     beforeEach ->
       inject (nemSimpleLogger) =>
-        nemSimpleLogger.currentLevel = nemSimpleLogger.LEVELS.debug
+        nemSimpleLogger.currentLevel = nemSimpleLogger.LEVELS.log
         @subject = nemSimpleLogger
-    describe 'single arg', ->
-      ['debug', 'info', 'warn', 'error', 'log'].forEach (testName) ->
-        it testName, ->
-          @subject[testName]('blah')
-          expect(@loggger[testName]).toHaveBeenCalled()
-          expect(@loggger[testName]).toHaveBeenCalledWith('blah')
 
-    describe 'multi arg', ->
-      ['debug', 'info', 'warn', 'error', 'log'].forEach (testName) ->
-        it testName, ->
-          @subject[testName]('blah','HI')
-          expect(@loggger[testName]).toHaveBeenCalled()
-          expect(@loggger[testName]).toHaveBeenCalledWith('blah', 'HI')
+    it 'error', ->
+      @subject.error('blah')
+      expect(@log.error).toHaveBeenCalled()
 
-  describe 'all off', ->
-    describe 'by LEVELS +1', ->
-      beforeEach ->
-        inject (nemSimpleLogger) =>
-          nemSimpleLogger.currentLevel = nemSimpleLogger.LEVELS.log + 1
-          @subject = nemSimpleLogger
+    it 'debug', ->
+      @subject.debug('blah')
+      expect(@log.debug).toHaveBeenCalled()
 
-      ['debug', 'info', 'warn', 'error', 'log'].forEach (testName) ->
-        it testName, ->
-          @subject[testName]('blah')
-          expect(@loggger[testName]).not.toHaveBeenCalled()
+    it 'info', ->
+      @subject.info('blah')
+      expect(@log.info).toHaveBeenCalled()
 
-    describe 'by doLog', ->
-      beforeEach ->
-        inject (nemSimpleLogger) =>
-          nemSimpleLogger.doLog = false
-          @subject = nemSimpleLogger
-
-      ['debug', 'info', 'warn', 'error', 'log'].forEach (testName) ->
-        it testName, ->
-          @subject[testName]('blah')
-          expect(@loggger[testName]).not.toHaveBeenCalled()
+    it 'warn', ->
+      @subject.warn('blah')
+      expect(@log.warn).toHaveBeenCalled()
 
   describe 'spawn', ->
     beforeEach ->
@@ -93,42 +72,12 @@ describe 'nemLogging.nemSimpleLogger', ->
       expect(@newLogger.debug).toBeDefined()
       expect(@newLogger != @subject).toBeTruthy()
 
-    it 'underlying logger is still $log', ->
-      expect(@newLogger.$log == @loggger).toBeTruthy()
-
-    describe 'throws', ->
-
-      it 'bad logger', ->
-        expect( => @subject.spawn({})).toThrow('@$log is invalid')
-
-      it 'partial logger', ->
-        expect( =>
-          @subject.spawn
-            log: ->
-            debug: ->
-            error: ->
-        ).toThrow('@$log is invalid')
-
-      it 'partial logger', ->
-        expect( =>
-          @subject.spawn
-            log: ->
-            debug: ->
-            error: ->
-        ).toThrow('@$log is invalid')
-
-      it 'undefined decorated logger', ->
-        expect =>
-          @subject.$log = undefined
-          @subject.spawn()
-        .toThrow('internalLogger undefined')
-
     describe 'Has Independent', ->
       it 'logLevels', ->
         @newLogger.currentLevel = @newLogger.LEVELS.debug
         expect(@newLogger.currentLevel != @subject.currentLevel).toBeTruthy()
         @newLogger.debug('blah')
-        expect(@loggger.debug).toHaveBeenCalled()
+        expect(@log.debug).toHaveBeenCalled()
         @newLogger.debug('blah')
         @subject.debug('blah')
         expect(@newLog.debug).toHaveBeenCalled()
@@ -145,16 +94,16 @@ describe 'nemLogging.nemSimpleLogger', ->
 
     it 'error', ->
       @subject.error('blah')
-      expect(@loggger.error).toHaveBeenCalled()
+      expect(@log.error).toHaveBeenCalled()
 
     it 'debug', ->
       @subject.debug('blah')
-      expect(@loggger.debug).toHaveBeenCalled()
+      expect(@log.debug).toHaveBeenCalled()
 
     it 'info', ->
       @subject.info('blah')
-      expect(@loggger.info).toHaveBeenCalled()
+      expect(@log.info).toHaveBeenCalled()
 
     it 'warn', ->
       @subject.warn('blah')
-      expect(@loggger.warn).toHaveBeenCalled()
+      expect(@log.warn).toHaveBeenCalled()

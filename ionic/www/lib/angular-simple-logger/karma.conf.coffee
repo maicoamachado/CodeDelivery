@@ -12,20 +12,20 @@ module.exports = (config) ->
   # available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
       'spec/**/*.coffee': ['coffee']
-      'dist/browser.js': ['coverage']
+    #'_public/*.js': ['coverage']
     }
 
     coverageReporter:
       reporters:[
-        { type : 'html', dir : 'dist/coverage/', subdir: 'lib' }
-        { type : 'cobertura', dir : 'dist/coverage/', subdir: 'lib' }
+        { type : 'html', dir : '_public/coverage/', subdir: 'lib' }
+        { type : 'cobertura', dir : '_public/coverage/', subdir: 'lib' }
       ]
 
   # list of files / patterns to load in the browser
     files: [
       'node_modules/angular/angular.js'
       'node_modules/angular-mocks/angular-mocks.js'
-      'dist/browser.js'
+      'dist/index.js'
       'spec/**/*.spec.coffee'
       #do not include those specs for jasmine html runner by karma kama_jasmine_runner.html
       {pattern:'*coffee', included: false}
@@ -41,7 +41,7 @@ module.exports = (config) ->
   # NOTE , TODO 'html' reporter use if you want to hit the karma jasmine runner (frequently causes karma to blow up at the end of run),
   # test results reporter to use
   # possible values: 'dots', 'progress', 'mocha'
-    reporters: ['mocha', 'coverage']
+    reporters: ['mocha']
 
   # htmlReporter:
   #   middlePathDir: "chrome"
