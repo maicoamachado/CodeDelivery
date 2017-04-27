@@ -6,7 +6,7 @@ Permission
 
 Dependencies
 ----------------------------
-- [Angular 1.4+](https://github.com/angular/angular) as MV* framework
+- [Angular](https://github.com/angular/angular) as MV* framework
 - [UI-Router](https://github.com/angular-ui/ui-router) as your router module
 
 Permission is the gatekeeper for your routes
@@ -42,7 +42,7 @@ Defining permissions
 
 Setting 
 ----------------------------
-So, how do you tell Permission what does 'anonymous', 'admin' or 'foo' mean and how to know if the current user belongs
+So, how do yo tell Permission what does 'anonymous', 'admin' or 'foo' mean and how to know if the current user belongs
 to those definitions?
 
 Well, Permission allows you to set different 'permissions' definitions along with the logic that determines if the current

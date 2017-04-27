@@ -6,50 +6,58 @@
 angular.module('starter.controllers', []);
 angular.module('starter.services', []);
 angular.module('starter.filters', []);
+angular.module('starter.run', []);
 
-angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers', 'starter.services', 'starter.filters',
-        'angular-oauth2', 'ngResource', 'ngCordova', 'uiGmapgoogle-maps', 'pusher-angular'
+angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers', 'starter.services', 'starter.filters', 'starter.run',
+        'angular-oauth2', 'ngResource', 'ngCordova', 'uiGmapgoogle-maps', 'pusher-angular', 'permission', 'http-auth-interceptor'
     ])
     .constant('appConfig', {
+        //baseUrl: 'http://www.skyinformatica.inf.br:47042',
         baseUrl: 'http://localhost:8000',
         pusherKey: 'ec62621b088caa2fe689',
+        redirectAfterLogin: {
+            client: 'client.order',
+            deliveryman: 'deliveryman.order'
+        }
     })
-    .run(['$ionicPlatform', '$window', 'appConfig', '$localStorage', function($ionicPlatform, $window, appConfig, $localStorage) {
-        $window.client = new Pusher(appConfig.pusherKey);
-        $ionicPlatform.ready(function() {
+    .run(['$ionicPlatform', '$window', 'appConfig', '$localStorage',
+        function($ionicPlatform, $window, appConfig, $localStorage) {
+            $window.client = new Pusher(appConfig.pusherKey);
+            $ionicPlatform.ready(function() {
 
-            if (window.cordova && window.cordova.plugins.Keyboard) {
-                // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
-                // for form inputs)
-                cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+                if (window.cordova && window.cordova.plugins.Keyboard) {
+                    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+                    // for form inputs)
+                    cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
 
-                // Don't remove this line unless you know what you are doing. It stops the viewport
-                // from snapping when text inputs are focused. Ionic handles this internally for
-                // a much nicer keyboard experience.
-                cordova.plugins.Keyboard.disableScroll(true);
-            }
-            if (window.StatusBar) {
-                StatusBar.styleDefault();
-            }
-            Ionic.io();
-            var push = new Ionic.Push({
-                debug: true,
-                onNotification: function(message) {
-                    alert(message.text);
-                },
-                pluginConfig: {
-                    android: {
-                        iconColor: 'red'
-                    }
+                    // Don't remove this line unless you know what you are doing. It stops the viewport
+                    // from snapping when text inputs are focused. Ionic handles this internally for
+                    // a much nicer keyboard experience.
+                    cordova.plugins.Keyboard.disableScroll(true);
                 }
-            });
+                if (window.StatusBar) {
+                    StatusBar.styleDefault();
+                }
+                Ionic.io();
+                var push = new Ionic.Push({
+                    debug: true,
+                    onNotification: function(message) {
+                        alert(message.text);
+                    },
+                    pluginConfig: {
+                        android: {
+                            iconColor: 'red'
+                        }
+                    }
+                });
 
-            push.register(function(token) {
-                $localStorage.set('device_token', token.token);
+                push.register(function(token) {
+                    $localStorage.set('device_token', token.token);
 
+                });
             });
-        });
-    }])
+        }
+    ])
     .config(function($stateProvider, $urlRouterProvider, OAuthProvider, OAuthTokenProvider, appConfig, $provide) {
         OAuthProvider.configure({
             baseUrl: appConfig.baseUrl,
@@ -66,9 +74,14 @@ angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers',
 
         $stateProvider
             .state('login', {
+                cache: false,
                 url: '/login',
                 templateUrl: 'templates/login.html',
                 controller: 'LoginCtrl'
+            })
+            .state('logout', {
+                url: '/logout',
+                controller: 'LogoutCtrl'
             })
             .state('home', {
                 url: '/home',
@@ -80,7 +93,12 @@ angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers',
                 cache: false,
                 url: '/client',
                 templateUrl: 'templates/client/menu.html',
-                controller: 'ClientMenuCtrl'
+                controller: 'ClientMenuCtrl',
+                data: {
+                    permissions: {
+                        only: ['client-role']
+                    }
+                }
             })
             .state('client.checkout', {
                 cache: false,
@@ -124,7 +142,12 @@ angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers',
                 cache: false,
                 url: '/deliveryman',
                 templateUrl: 'templates/deliveryman/menu.html',
-                controller: 'DeliverymanMenuCtrl'
+                controller: 'DeliverymanMenuCtrl',
+                data: {
+                    permissions: {
+                        only: ['deliveryman-role']
+                    }
+                }
             })
             .state('deliveryman.order', {
                 url: '/order',
@@ -168,4 +191,10 @@ angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers',
             });
             return $delegate;
         }]);
+
+        $provide.decorator('oauthInterceptor', ['$delegate', function($delegate) {
+            delete $delegate['responseError'];
+            return $delegate;
+        }]);
+
     });

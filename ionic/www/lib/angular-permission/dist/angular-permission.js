@@ -1,7 +1,7 @@
 /**
  * angular-permission
  * Route permission and access control as simple as it can get
- * @version v2.1.3 - 2016-03-08
+ * @version v2.1.0 - 2016-03-01
  * @link http://www.rafaelvidaurre.com
  * @author Rafael Vidaurre <narzerus@gmail.com>
  * @license MIT License, http://www.opensource.org/licenses/MIT
@@ -115,20 +115,23 @@
             $state
               .go(toState.name, toParams, {notify: false})
               .then(function () {
-                $rootScope.$broadcast('$stateChangeSuccess', toState, toParams);
+                $rootScope.$broadcast('$stateChangeSuccess', toState, toParams, options);
               });
           })
           .catch(function (rejectedPermission) {
             $rootScope.$broadcast('$stateChangePermissionDenied', toState, toParams, options);
 
-            return permissions
-              .resolveRedirectState(rejectedPermission)
+            return permissions.resolveRedirectState(rejectedPermission)
               .then(function (redirectStateName) {
-                $state.go(redirectStateName, toParams);
+                $state.go(redirectStateName, toParams, {notify: false});
+              })
+              .then(function () {
+                $rootScope.$broadcast('$stateChangeSuccess', toState, toParams, options);
               });
           })
           .finally(function () {
             setStateAuthorizationStatus(false);
+            $rootScope.$broadcast('$stateChangeSuccess');
           });
       }
 
@@ -152,7 +155,6 @@
     });
   }]);
 }());
-
 
 (function () {
   'use strict';
@@ -291,7 +293,6 @@
       return PermissionMap;
     }]);
 }());
-
 (function () {
   'use strict';
 
@@ -365,7 +366,6 @@
       return Permission;
     }]);
 }());
-
 (function () {
   'use strict';
 
@@ -471,7 +471,6 @@
       return Role;
     }]);
 }());
-
 (function () {
   'use strict';
 
@@ -559,7 +558,6 @@
       }
     }]);
 }());
-
 (function () {
   'use strict';
 
@@ -631,7 +629,6 @@
       }
     }]);
 }());
-
 (function () {
   'use strict';
 
@@ -648,7 +645,6 @@
     .directive('permission', ['$log', 'Authorization', 'PermissionMap', function ($log, Authorization, PermissionMap) {
       return {
         restrict: 'A',
-        scope: true,
         bindToController: {
           only: '=',
           except: '='
@@ -680,7 +676,6 @@
       };
     }]);
 }());
-
 
 (function () {
   'use strict';

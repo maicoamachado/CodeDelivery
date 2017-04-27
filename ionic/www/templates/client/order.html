@@ -6,7 +6,7 @@
     <ion-content class="padding has-subheader">
         <ion-refresher pulling-text="Puxe para atualizar..." on-refresh="doRefresh()"></ion-refresher>
         <ion-list>
-            <ion-item ng-repeat="o in orders" ng-click="openOrderDatail(o)" on-hold="showActionSheet(o)">
+            <ion-item collection-repeat="o in orders" ng-click="openOrderDatail(o)" on-hold="showActionSheet(o)">
                 <h2>#{{ o.id }}</h2>
                 <div class="row">
                     <div class="col">
@@ -18,7 +18,11 @@
                         <i class="ion ion-social-usd"> {{ o.total|number:2 }}</i>
                     </div>
                 </div>
+                <ion-option-button class="button balanced">Ação 1</ion-option-button>
+                <ion-option-button class="button assertive">Ação 2</ion-option-button>
+                <ion-option-button class="button positive">Ação 3</ion-option-button>
             </ion-item>
         </ion-list>
+        <ion-infinite-scroll ng-if="canMoreItems" on-infinite="loadMore()" distance="1%"></ion-infinite-scroll>
     </ion-content>
 </ion-view>

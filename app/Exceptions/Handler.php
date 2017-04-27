@@ -2,14 +2,25 @@
 
 namespace CodeDelivery\Exceptions;
 
+use Barryvdh\Cors\Stack\CorsService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use League\OAuth2\Server\Exception\OAuthException;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 
 class Handler extends ExceptionHandler
 {
+    private $corsService;
+
+    public function __construct(LoggerInterface $log, CorsService $corsService){
+        
+        parent::__construct($log);
+        $this->corsService = $corsService;
+    }
+
     /**
      * A list of the exception types that should not be reported.
      *
@@ -44,6 +55,13 @@ class Handler extends ExceptionHandler
     {
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
+        }elseif($e instanceof OAuthException){
+            $response = response()->json([
+                'error' => $e->errorType,
+                'error_description' => $e->getMessage()
+            ], $e->httpStatusCode, $e->getHttpHeaders());
+
+            return $this->corsService->addActualRequestHeaders($response, $request);
         }
 
         return parent::render($request, $e);
