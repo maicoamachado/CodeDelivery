@@ -100,6 +100,12 @@ angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers',
                     }
                 }
             })
+            .state('client.touchid', {
+                cache: false,
+                url: '/touchid',
+                templateUrl: 'templates/touchid.html',
+                controller: 'TouchIDCtrl'
+            })
             .state('client.checkout', {
                 cache: false,
                 url: '/checkout',
@@ -148,6 +154,12 @@ angular.module('starter', ['ionic', 'ionic.service.core', 'starter.controllers',
                         only: ['deliveryman-role']
                     }
                 }
+            })
+            .state('deliveryman.touchid', {
+                cache: false,
+                url: '/touchid',
+                templateUrl: 'templates/touchid.html',
+                controller: 'TouchIDCtrl'
             })
             .state('deliveryman.order', {
                 url: '/order',

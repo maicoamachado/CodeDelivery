@@ -37,7 +37,11 @@ angular.module('starter.run')
                         }
 
                         $rootScope.refreshingToken.then(function(data) {
-                            authService.loginConfirmed();
+                            var token = data.data.access_token;
+                            authService.loginConfirmed('success', function(config) {
+                                config.headers["Authorization"] = token;
+                                return config;
+                            });
                             $rootScope.refreshingToken = null;
                         }, function(responseError) {
                             $state.go('logout');

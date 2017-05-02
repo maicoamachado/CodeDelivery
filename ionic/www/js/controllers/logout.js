@@ -1,15 +1,7 @@
 angular.module('starter.controllers').
-controller('LogoutCtrl', ['$scope', '$state', 'OAuthToken', 'UserData', '$ionicHistory',
-    function($scope, $state, OAuthToken, UserData, $ionicHistory) {
-        OAuthToken.removeToken();
-        UserData.set(null);
-        $ionicHistory.clearCache();
-        $ionicHistory.clearHistory();
-        $ionicHistory.nextViewOptions({
-            disableBack: true,
-            historyRoot: true
-        });
-
+controller('LogoutCtrl', ['$scope', '$state', '$auth',
+    function($scope, $state, $auth) {
+        $auth.logout();
         $state.go('login');
     }
 ]);
